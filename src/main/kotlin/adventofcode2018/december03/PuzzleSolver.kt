@@ -1,6 +1,7 @@
 package adventofcode2018.december03
 
 import adventofcode2018.PuzzleSolverAbstract
+import com.tool.mylambdas.mapCombinedAll
 
 fun main() {
     PuzzleSolver(test=false).showResult()
@@ -23,16 +24,6 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 //            .groupingBy { it }
 //            .eachCount()                     // Map<Coordinate, Int>
 //            .count { it.value > 1 }
-    }
-
-    public inline fun <S, T> List<T>.mapCombinedAll(combineOperation: (T, T) -> S): List<S> {
-        var result = mutableListOf<S>()
-        for (i in 0 until this.size-1) {
-            for (j in i+1 until this.size) {
-                result += combineOperation(this[i], this[j])
-            }
-        }
-        return result
     }
 
     override fun resultPartTwo(): Any {

@@ -14,3 +14,13 @@ fun <T> Iterable<T>.splitByCondition(predicate: (T) -> Boolean): List<List<T>> {
     result.add(tmp)
     return result
 }
+
+inline fun <S, T> List<T>.mapCombinedAll(combineOperation: (T, T) -> S): List<S> {
+    var result = mutableListOf<S>()
+    for (i in 0 until this.size-1) {
+        for (j in i+1 until this.size) {
+            result += combineOperation(this[i], this[j])
+        }
+    }
+    return result
+}

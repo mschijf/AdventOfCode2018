@@ -10,7 +10,7 @@ data class RectangleSet(
             return this
         var leftOver = listOf(newRectangle)
         for (rectangle in rectangleList) {
-            leftOver = leftOver.map { leftOverRectangle -> leftOverRectangle.minus(rectangle) }.flatten()
+            leftOver = leftOver.flatMap { leftOverRectangle -> leftOverRectangle.minus(rectangle) }
         }
         return RectangleSet(rectangleList + leftOver)
     }

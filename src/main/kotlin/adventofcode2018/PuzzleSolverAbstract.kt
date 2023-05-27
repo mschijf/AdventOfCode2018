@@ -1,5 +1,7 @@
 package adventofcode2018
 
+import adventofcode2018.december04.Guard
+
 abstract class PuzzleSolverAbstract (
     val test: Boolean) {
 

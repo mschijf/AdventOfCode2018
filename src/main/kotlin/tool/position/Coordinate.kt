@@ -29,5 +29,12 @@ data class Coordinate(val x: Int, val y: Int) {
     fun southwest() = moveOneStep(WindDirection.SOUTHWEST)
 
     fun manhattanDistance(otherPos: Coordinate) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
+
+    companion object {
+        fun of(input: String): Coordinate =
+            input.split(",")
+                .map { it.trim().toInt() }
+                .run { Coordinate(this[0], this[1]) }
+    }
 }
 

@@ -32,31 +32,25 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             steps[it.second]!!.addDependency(steps[it.first]!!)
         }
 
-        val workersOrg = Array<Step?>(2){null}
-        var result = ""
+        val maxWorkers = if (test) 2 else 5
+        val workers = mutableListOf<Step>()
         while (steps.values.any { !it.hasBeenExecuted() }) {
-            for (i in workersOrg.indices) {
-                if (workersOrg[i] != null && workersOrg[i]!!.hasBeenExecuted())
-                    workersOrg[i] = null
-            }
-
             val nextSteps = steps.values.filter { it.canBeDone() }.sortedBy { it.name }
             for (step in nextSteps) {
-                val availableWorkerIndex = workersOrg.indexOfFirst {it == null}
-                if (availableWorkerIndex != -1) {
-                    workersOrg[availableWorkerIndex]  = step
-//                    result = "$result${step.name}"
+                if (workers.size < maxWorkers) {
+                    workers.add(step)
                 }
             }
-            val executionTime = workersOrg.filterNotNull().minOf { it.timeToFinish() }
-            workersOrg.filterNotNull().forEach { w -> w.execute(executionTime) }
+            val executionTime = workers.minOf { it.timeToFinish() }
+            workers.forEach { w -> w.execute(executionTime) }
+            workers.removeIf { w -> w.hasBeenExecuted() }
 
             totalTime += executionTime
         }
         return totalTime
     }
 
-    class Step(val name: String, private val basicTime: Int = 0) {
+    class Step(val name: String, basicTime: Int = 0) {
         private val dependencyList = mutableListOf<Step>()
         private var done = false
 
@@ -78,7 +72,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         }
 
         override fun toString(): String {
-            return "@$name: ${dependencyList}"
+            return "@$name: $dependencyList"
         }
     }
 }

@@ -7,7 +7,7 @@ fun main() {
 }
 
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
-    private val simpleInput = inputLines.map{ it.substringAfter("Step ").substringBefore(" must be") to it.substringAfter("step ").substringBefore(" can begin")}
+    private val simpleInput = inputLines.map{ it.split(" ").run{this[1] to this[7]}}
 
     override fun resultPartOne(): Any {
         val steps = (simpleInput.map{it.first} + simpleInput.map{it.second}).distinct().associateWith{letter -> Step(letter)}

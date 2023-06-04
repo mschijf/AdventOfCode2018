@@ -1,70 +1,104 @@
 package tool.collectionspecials
 
-class CircularLinkedList<T : Any> : Iterable<T> {
+interface ListPointer {
+    operator fun plus(steps: Int): ListPointer
+    operator fun minus(steps: Int): ListPointer
+}
 
-    private var first: Node<T>? = null
+interface ICircularLinkedList<T> : Iterable<T> {
+    fun isEmpty(): Boolean
+    fun add(element: T): ListPointer
+    fun add(pos: ListPointer, element: T): ListPointer
+    fun removeAt(p: ListPointer): Boolean
+    operator fun get(p: ListPointer): T
+}
+
+fun <T>emptyCircularList(): ICircularLinkedList<T> {
+    return CircularLinkedList<T>()
+}
+
+class CircularLinkedList<T> : ICircularLinkedList<T> {
+
+    private var first: Node? = null
+    fun firstOrNull(): ListPointer? = first
+
     var size = 0
         private set
 
-    fun isEmpty() = size == 0
-    fun first() = first
+    override fun isEmpty() = size == 0
 
-    fun init(data: T): Node<T> {
-        first = Node<T>(data)
-        size = 1
+    override fun add(element: T): ListPointer {
+        return if (first == null) {
+            addFirst(element)
+        } else {
+            add(firstOrNull()!!, element)
+        }
+    }
+
+    private fun addFirst(element: T): ListPointer {
+        size++
+        first = Node(element)
         return first!!
     }
 
-    fun insertAfter(after: Node<T>, data: T): Node<T> {
-        val new = Node<T>(data, after, after.next)
-        val tmpNext = new.next
+    override fun add(pos: ListPointer, element: T): ListPointer {
+        val node = pos.toNode()
+        val new = Node(element, node.prev, node)
         val tmpPrev = new.prev
-        tmpNext.prev = new
+        val tmpNext = new.next
         tmpPrev.next = new
+        tmpNext.prev = new
         size++
         return new
     }
 
-    fun remove(node: Node<T>) {
-        node.prev.next = node.next
-        node.next.prev = node.prev
-        if (first == node) {
-            first = node.next
+    override fun removeAt(p: ListPointer): Boolean {
+        val nodeToBeRemoved = p.toNode()
+        nodeToBeRemoved.prev.next = nodeToBeRemoved.next
+        nodeToBeRemoved.next.prev = nodeToBeRemoved.prev
+        if (first == nodeToBeRemoved) {
+            first = nodeToBeRemoved.next
         }
         size--
         if (size == 0) {
             first = null
         }
+        return true
     }
 
-    fun getNextNode(aNode: Node<T>, steps: Int=0): Node<T> {
-        var current = aNode
-        if (steps >= 0) {
-            repeat(steps % size) {current = current.next}
-        } else {
-            repeat(-(steps % size)) {current = current.prev}
-        }
-        return current
+    override fun get(p: ListPointer): T {
+        return p.toNode().data
     }
 
-    fun getPreviousNode(aNode: Node<T>, steps: Int=0): Node<T> {
-        return getNextNode(aNode, -steps)
-    }
+    private fun ListPointer.toNode() = (this as CircularLinkedList<T>.Node)
 
     override fun toString() = this.joinToString(" ")
 
-    override fun iterator(): Iterator<T>  = CycledLinkedListIterator(this)
+    private inner class Node(val data: T, pprev: Node?=null, pnext: Node?=null): ListPointer {
+        var prev: Node = pprev ?: this
+        var next: Node = pnext ?: this
 
-    inner class Node<T>(val data: T, parPrev: Node<T>?=null, parNext: Node<T>?=null) {
+        override fun plus(steps: Int): ListPointer {
+            var current = this
+            if (steps >= 0) {
+                repeat(steps % size) { current = current.next }
+            } else {
+                repeat(-(steps % size)) { current = current.prev }
+            }
+            return current
+        }
 
-        var prev: Node<T> = parPrev ?: this
-        var next: Node<T> = parNext ?: this
+        override fun minus(steps: Int): ListPointer {
+            return plus(-steps)
+        }
 
         override fun toString() = data.toString()
     }
 
-    inner class CycledLinkedListIterator<T: Any>(private val cll: CircularLinkedList<T>): Iterator<T> {
-        private var current = cll.first()
+    override fun iterator(): Iterator<T>  = CircularLinkedListIterator(this)
+
+    inner class CircularLinkedListIterator(private val cll: CircularLinkedList<T>): Iterator<T> {
+        private var current = firstOrNull()?.toNode()
         private var neverIterated = true
 
         override fun hasNext(): Boolean {
@@ -79,8 +113,8 @@ class CircularLinkedList<T : Any> : Iterable<T> {
             if (!hasNext())
                 throw Exception("No next on CycledLinkedList iterator")
             neverIterated = false
-            val data = current?.data!!
-            current = current?.next
+            val data = current!!.data
+            current = current!!.next
             return data
         }
     }

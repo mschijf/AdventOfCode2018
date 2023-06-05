@@ -2,7 +2,7 @@ package adventofcode2018.december06
 
 import adventofcode2018.PuzzleSolverAbstract
 import tool.position.Coordinate
-import tool.position.print
+import tool.position.printAsGrid
 
 fun main() {
     PuzzleSolver(test=true).showResult()
@@ -16,7 +16,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
     override fun resultPartOne(): Any {
         val gridMap = createMapPuzzleOne()
-        gridMap.print { it.gridValueToString() }
+        gridMap.printAsGrid { it.gridValueToString() }
         val singleFields = gridMap.filter { it.value.size == 1 }.map{it.key to it.value.first()}.toMap()
         val borderFields = singleFields.filter{it.key.isBorder()}.values.toSet()
         val resultFields = singleFields.values.filterNot{it in borderFields}.groupingBy { it }.eachCount()
@@ -26,7 +26,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     override fun resultPartTwo(): Any {
         val maxManhattanDistance = if (test) 32 else 10_000
         val gridMap = createMapPuzzleTwo()
-        gridMap.print { item -> if (item < 32) "#" else "." }
+        gridMap.printAsGrid { item -> if (item < 32) "#" else "." }
         return gridMap.values.count { it < maxManhattanDistance }
     }
 

@@ -44,8 +44,8 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return carts.filter { !it.hasCrashed }
     }
 
-    private fun readRails(): Map<Coordinate, Char> {
-        return inputLines.flatMapIndexed { y: Int, s: String ->
+    private fun readRails(): Map<Coordinate, Char> =
+        inputLines.flatMapIndexed { y: Int, s: String ->
             s.mapIndexed { x, c ->
                 when (c) {
                     in "<>" -> Coordinate(x,y) to '-'
@@ -54,15 +54,16 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
                 }
             }
         }.filter{it.second != ' '}.toMap()
-    }
 
-    private fun readCarts(): List<Cart> {
-        return inputLines.flatMapIndexed { y: Int, s: String ->
+    private fun readCarts() =
+        inputLines.flatMapIndexed { y: Int, s: String ->
             s.mapIndexed { x, c ->
-                if (c in "<>^v") Cart(rails, Coordinate(x,y), Direction.values().first { it.directionChar == c }) else null
+                if (c in "<>^v") Cart(rails, Coordinate(x,y), c.toDirection()) else null
             }
         }.filterNotNull()
-    }
+
+    private fun Char.toDirection() =
+        Direction.values().first { it.directionChar == this }
 }
 
 class Cart (
@@ -73,7 +74,8 @@ class Cart (
     var hasCrashed = false
 
     fun step() {
-        pos = pos.plusXY(direction.dCol(), direction.dRow()) //moveOneStep(direction)
+        pos = pos.plusXY(direction.dCol(), direction.dRow())
+//        pos = pos.moveOneStep(direction) ==> cannot use this one, since Direction.Down does y-1 where the y-coordinate increases when going down
         direction = when (rails[pos]!!) {
             '-', '|' -> direction
             '/' -> when (direction) {

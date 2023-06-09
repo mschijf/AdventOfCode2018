@@ -1,9 +1,9 @@
 package adventofcode2018.december10
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.position.Coordinate
-import tool.position.area
-import tool.position.printAsGrid
+import tool.coordinatesystem.Coordinate
+import tool.coordinatesystem.area
+import tool.coordinatesystem.printAsGrid
 
 fun main() {
     PuzzleSolver(test=false).showResult()

@@ -1,7 +1,7 @@
 package adventofcode2018.december11
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.position.Coordinate
+import tool.coordinatesystem.Coordinate
 
 fun main() {
     PuzzleSolver(test=false).showResult()

@@ -1,4 +1,4 @@
-package tool.position
+package tool.coordinatesystem
 
 fun <T> Map<Coordinate, T>.printAsGrid(default: String=".", itemAsString: (T)->String) {
     val maxX = this.keys.maxByOrNull { it.x }?.x ?: -1

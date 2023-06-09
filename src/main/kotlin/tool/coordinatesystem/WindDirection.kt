@@ -1,4 +1,4 @@
-package tool.position
+package tool.coordinatesystem
 
 enum class WindDirection(val dX: Int, val dY: Int, val directionSymbol: String) {
     NORTH(0,1, "N") {

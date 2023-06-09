@@ -1,6 +1,6 @@
 package adventofcode2018.december03
 
-import tool.position.Coordinate
+import tool.coordinatesystem.Coordinate
 import kotlin.math.max
 import kotlin.math.min
 

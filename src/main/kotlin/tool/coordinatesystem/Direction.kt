@@ -1,4 +1,4 @@
-package tool.position
+package tool.coordinatesystem
 
 enum class Direction(val dX: Int, val dY: Int, val directionChar: Char) {
     UP(0,1, '^') {

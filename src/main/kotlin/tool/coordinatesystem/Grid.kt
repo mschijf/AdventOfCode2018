@@ -17,6 +17,20 @@ fun <T> Map<Coordinate, T>.printAsGrid(default: String=".", itemAsString: (T)->S
     }
 }
 
+fun Collection<Coordinate>.printAsGrid(itemAsString: (Coordinate)->String) {
+    val maxX = this.maxByOrNull { it.x }?.x ?: -1
+    val maxY = this.maxByOrNull { it.y }?.y ?: -1
+
+    (0..maxY).forEach { y ->
+        (0..maxX).forEach { x ->
+            val field = Coordinate(x,y)
+            print(itemAsString(field))
+        }
+        println()
+    }
+}
+
+
 fun Set<Coordinate>.printAsGrid(defaultEmpty: String=".", defaultAvailable: String="#") {
     val minX = this.minByOrNull { it.x }?.x ?: -1
     val minY = this.minByOrNull { it.y }?.y ?: -1

@@ -32,6 +32,11 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
 
     override fun resultPartTwo(): Any {
+//        TGinsberg solution:
+//        val stopList = "074501".map { it.toString().toInt() }.toList()
+//        return recipes { it.endsWith(stopList) }.size - stopList.size
+
+
         val puzzleInput = "074501"
         val maxArraySize = 500_000_000
         val scoreList = IntArray(maxArraySize)
@@ -69,6 +74,33 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             x = 10*x + this[i]
         return x == matchValue.toInt()
     }
+
+    private fun recipes(stopCondition: (List<Int>) -> Boolean): List<Int> {
+        val history = mutableListOf(3, 7)
+        var elf1 = 0
+        var elf2 = 1
+        var stop = false
+
+        while (!stop) {
+            val nextValue = history[elf1] + history[elf2]
+            nextValue.asDigits().forEach {
+                if (!stop) {
+                    history.add(it)
+                    stop = stopCondition(history)
+                }
+            }
+            elf1 = (elf1 + history[elf1] + 1) % history.size
+            elf2 = (elf2 + history[elf2] + 1) % history.size
+        }
+        return history
+    }
+
+    private fun Int.asDigits(): List<Int> =
+        this.toString().map { it.toString().toInt() }
+
+    private fun List<Int>.endsWith(other: List<Int>): Boolean =
+        if (this.size < other.size) false
+        else this.slice(this.size - other.size until this.size) == other
 }
 
 

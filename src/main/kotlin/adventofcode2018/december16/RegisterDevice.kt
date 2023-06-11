@@ -43,8 +43,6 @@ class RegisterDevice(
             OpCode.EQIR -> register[c] = if (a == register[b]) 1 else 0 //eqir (equal immediate/register) sets register C to 1 if value A is equal to register B. Otherwise, register C is set to 0.
             OpCode.EQRI -> register[c] = if (register[a] == b) 1 else 0 //eqri (equal register/immediate) sets register C to 1 if register A is equal to value B. Otherwise, register C is set to 0.
             OpCode.EQRR -> register[c] = if (register[a] == register[b]) 1 else 0 //eqrr (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
-
-            else -> throw Exception("Unknown Opcode")
         }
     }
 

@@ -13,8 +13,8 @@ class RegisterDevice(
 
 
     fun instructionByOpcode(opcode: Int, a: Int, b: Int, c: Int) {
-        if (intToOpcode.isEmpty())
-            throw Exception("Empty Int to opcode map")
+        if (intToOpcode.size != OpCode.values().size)
+            throw Exception("Expected ${OpCode.values().size} but got ${intToOpcode.size}")
 
         instructionByName(intToOpcode[opcode]!!, a, b, c)
     }

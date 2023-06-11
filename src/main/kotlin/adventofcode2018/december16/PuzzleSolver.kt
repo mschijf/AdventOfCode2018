@@ -32,7 +32,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             val params = instruction.split(" ").map{it.toInt()}
             device.instructionByOpcode(params[0], params[1], params[2], params[3])
         }
-        return device
+        return "$device ==> answer is first number (register 0)"
     }
 
     private fun List<Sample>.determineIntToCode(): Map<Int, OpCode> {

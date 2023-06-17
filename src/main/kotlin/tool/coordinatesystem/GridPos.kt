@@ -2,8 +2,8 @@ package tool.coordinatesystem
 
 import kotlin.math.absoluteValue
 
-data class Coordinate(val x: Int, val y: Int) {
-    fun plusXY(dx: Int, dy: Int) = Coordinate(x+dx, y+dy)
+data class GridPos(val x: Int, val y: Int) {
+    fun plusXY(dx: Int, dy: Int) = GridPos(x+dx, y+dy)
 
     fun plusX(dx: Int) = plusXY(dx, 0)
     fun plusY(dy: Int) = plusXY(0, dy)
@@ -28,13 +28,13 @@ data class Coordinate(val x: Int, val y: Int) {
     fun northwest() = moveOneStep(WindDirection.NORTHWEST)
     fun southwest() = moveOneStep(WindDirection.SOUTHWEST)
 
-    fun manhattanDistance(otherPos: Coordinate) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
+    fun manhattanDistance(otherPos: GridPos) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
 
     companion object {
-        fun of(input: String): Coordinate =
+        fun of(input: String): GridPos =
             input.split(",")
                 .map { it.trim().toInt() }
-                .run { Coordinate(this[0], this[1]) }
+                .run { GridPos(this[0], this[1]) }
     }
 
     private fun Direction.dX() =
@@ -42,12 +42,12 @@ data class Coordinate(val x: Int, val y: Int) {
             Direction.DOWN -> 0
             Direction.UP -> 0
             Direction.LEFT -> -1
-            Direction.RIGHT -> -1
+            Direction.RIGHT -> 1
         }
     private fun Direction.dY() =
         when(this) {
-            Direction.DOWN -> -1
-            Direction.UP -> 1
+            Direction.DOWN -> 1
+            Direction.UP -> -1
             Direction.LEFT -> 0
             Direction.RIGHT -> 0
         }
@@ -65,8 +65,8 @@ data class Coordinate(val x: Int, val y: Int) {
         }
     private fun WindDirection.dY() =
         when (this) {
-            WindDirection.NORTH -> 1
-            WindDirection.SOUTH -> -1
+            WindDirection.NORTH -> -1
+            WindDirection.SOUTH -> 1
             WindDirection.EAST -> 0
             WindDirection.WEST -> 0
             WindDirection.NORTHEAST -> WindDirection.NORTH.dX()

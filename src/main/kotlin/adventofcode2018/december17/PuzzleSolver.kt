@@ -1,27 +1,26 @@
 package adventofcode2018.december17
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Coordinate
+import tool.coordinatesystem.GridPos
 import tool.coordinatesystem.printGrid
 
 fun main() {
     PuzzleSolver(test=false).showResult()
 }
 
-//33366 ==> too high
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
-    private val waterSpring = Coordinate(500,0)
-    private val claySet = inputLines.flatMap{ line -> line.coordinateLine()}.toSet()
+    private val waterSpring = GridPos(500,0)
+    private val claySet = inputLines.flatMap{ line -> line.toPosList()}.toSet()
     private val minX = claySet.minOf { it.x }
     private val minY = claySet.minOf { it.y }
     private val maxX = claySet.maxOf { it.x }
     private val maxY = claySet.maxOf { it.y }
-    private val upperLeft = Coordinate(minX-1, 0)
-    private val lowerRight = Coordinate(maxX+1, maxY+1)
+    private val upperLeft = GridPos(minX-1, 0)
+    private val lowerRight = GridPos(maxX+1, maxY+1)
 
-    private val wetSandSet = mutableSetOf<Coordinate>()
-    private val waterSet = mutableSetOf<Coordinate>()
+    private val wetSandSet = mutableSetOf<GridPos>()
+    private val waterSet = mutableSetOf<GridPos>()
 
     override fun resultPartOne(): Any {
         dropDown(waterSpring)
@@ -45,25 +44,25 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         }
     }
 
-    private fun String.coordinateLine(): List<Coordinate> {
+    private fun String.toPosList(): List<GridPos> {
         return when {
             this.startsWith("x") -> {
                 val x = this.substringAfter("x=").substringBefore(",").toInt()
                 val yRange = this.substringAfter("y=").substringBefore("..").toInt()..this.substringAfter("..").toInt()
-                yRange.map { y -> Coordinate(x, y) }
+                yRange.map { y -> GridPos(x, y) }
             }
 
             this.startsWith("y") ->  {
                 val y = this.substringAfter("y=").substringBefore(",").toInt()
                 val xRange = this.substringAfter("x=").substringBefore("..").toInt()..this.substringAfter("..").toInt()
-                xRange.map { x -> Coordinate(x, y) }
+                xRange.map { x -> GridPos(x, y) }
             }
 
             else -> throw Exception("unexpected start of string")
         }
     }
 
-    private fun dropDown(c: Coordinate) {
+    private fun dropDown(c: GridPos) {
         if (c in claySet || c.y > maxY)
             return
         if (c in wetSandSet)
@@ -73,8 +72,8 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
         wetSandSet += c
 
-        dropDown(c.plusY(1))
-        if (c.plusY(1) in claySet || c.plusY(1) in waterSet) {
+        dropDown(c.down())
+        if (c.down() in claySet || c.down() in waterSet) {
             dropDown(c.left())
             dropDown(c.right())
         }
@@ -83,7 +82,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             c.fillWithWater()
         }
     }
-    private fun Coordinate.canBeFilled(): Boolean {
+    private fun GridPos.canBeFilled(): Boolean {
         var walker = this.left()
         while (walker !in claySet && (walker.plusY(1) in claySet || walker.plusY(1) in waterSet)) {
             walker = walker.left()
@@ -100,7 +99,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return true
     }
 
-    private fun Coordinate.fillWithWater() {
+    private fun GridPos.fillWithWater() {
         waterSet += this
         var walker = this.left()
         while (walker !in claySet) {

@@ -1,7 +1,7 @@
 package adventofcode2018.december15
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Coordinate
+import tool.coordinatesystem.GridPos
 import tool.coordinatesystem.printAsGrid
 
 fun main() {
@@ -11,15 +11,15 @@ fun main() {
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
     private val caveWalls = inputLines.flatMapIndexed { y: Int, s: String ->
-        s.mapIndexed { x, c -> if (c == '#') Coordinate(x,y) else null }
+        s.mapIndexed { x, c -> if (c == '#') GridPos(x,y) else null }
     }.filterNotNull().toSet()
 
     private val elfList = inputLines.flatMapIndexed { y: Int, s: String ->
-        s.mapIndexed { x, c -> if (c == 'E') Elf(Coordinate(x, y)) else null }
+        s.mapIndexed { x, c -> if (c == 'E') Elf(GridPos(x, y)) else null }
     }.filterNotNull().toSet()
 
     private val goblinList = inputLines.flatMapIndexed { y: Int, s: String ->
-        s.mapIndexed { x, c -> if (c == 'G') Goblin (Coordinate(x, y)) else null }
+        s.mapIndexed { x, c -> if (c == 'G') Goblin (GridPos(x, y)) else null }
     }.filterNotNull().toSet()
 
     override fun resultPartOne(): Any {
@@ -102,14 +102,14 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return true
     }
 
-    private fun Coordinate.toUnit(): Unit {
+    private fun GridPos.toUnit(): Unit {
         return (goblinList + elfList).filter { it.isAlive() }.first { it.pos == this }
     }
 
 
 
-    private fun Set<Coordinate>.nearestInRangeOption(from: Coordinate, blocked: Set<Coordinate>): Coordinate? {
-        val result = mutableMapOf<Coordinate, Int>().apply{ this[from] = 0 }
+    private fun Set<GridPos>.nearestInRangeOption(from: GridPos, blocked: Set<GridPos>): GridPos? {
+        val result = mutableMapOf<GridPos, Int>().apply{ this[from] = 0 }
 
         var start = 0
         while (true) {
@@ -129,8 +129,8 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         }
     }
 
-    private fun Coordinate.nextStep(to: Coordinate, blocked: Set<Coordinate>): Coordinate {
-        val result = mutableMapOf<Coordinate, Int>().apply{ this[to] = 0 }
+    private fun GridPos.nextStep(to: GridPos, blocked: Set<GridPos>): GridPos {
+        val result = mutableMapOf<GridPos, Int>().apply{ this[to] = 0 }
 
         var start = 0
         var neighbours = result.keys.toList()
@@ -154,7 +154,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 }
 
 
-abstract class Unit(var pos: Coordinate) : Comparable<Unit> {
+abstract class Unit(var pos: GridPos) : Comparable<Unit> {
     private val initialPos = pos
     override fun compareTo(other: Unit): Int {
         return compareValuesBy(this, other, { it.pos.y }, { it.pos.x })
@@ -164,7 +164,7 @@ abstract class Unit(var pos: Coordinate) : Comparable<Unit> {
         return "(${pos.x},${pos.y}) has $hitPoints hit points"
     }
 
-    fun moveTo(newPos: Coordinate) {
+    fun moveTo(newPos: GridPos) {
         pos = newPos
     }
 
@@ -186,13 +186,13 @@ abstract class Unit(var pos: Coordinate) : Comparable<Unit> {
 }
 
 
-class Goblin(pos: Coordinate): Unit(pos) {
+class Goblin(pos: GridPos): Unit(pos) {
     override fun toString(): String {
         return "Goblin: " + super.toString()
     }
 }
 
-class Elf(pos: Coordinate): Unit(pos) {
+class Elf(pos: GridPos): Unit(pos) {
     override fun toString(): String {
         return "Elf: " + super.toString()
     }

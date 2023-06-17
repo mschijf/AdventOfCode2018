@@ -1,8 +1,8 @@
 package adventofcode2018.december13
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Coordinate
 import tool.coordinatesystem.Direction
+import tool.coordinatesystem.GridPos
 
 fun main() {
     PuzzleSolver(test=false).showResult()
@@ -44,13 +44,13 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return carts.filter { !it.hasCrashed }
     }
 
-    private fun readRails(): Map<Coordinate, Char> =
+    private fun readRails(): Map<GridPos, Char> =
         inputLines.flatMapIndexed { y: Int, s: String ->
             s.mapIndexed { x, c ->
                 when (c) {
-                    in "<>" -> Coordinate(x,y) to '-'
-                    in "^v" -> Coordinate(x,y) to '|'
-                    else -> Coordinate(x,y) to c
+                    in "<>" -> GridPos(x,y) to '-'
+                    in "^v" -> GridPos(x,y) to '|'
+                    else -> GridPos(x,y) to c
                 }
             }
         }.filter{it.second != ' '}.toMap()
@@ -58,7 +58,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     private fun readCarts() =
         inputLines.flatMapIndexed { y: Int, s: String ->
             s.mapIndexed { x, c ->
-                if (c in "<>^v") Cart(rails, Coordinate(x,y), c.toDirection()) else null
+                if (c in "<>^v") Cart(rails, GridPos(x,y), c.toDirection()) else null
             }
         }.filterNotNull()
 
@@ -67,15 +67,15 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 }
 
 class Cart (
-    private val rails: Map<Coordinate, Char>,
-    private var pos: Coordinate,
+    private val rails: Map<GridPos, Char>,
+    private var pos: GridPos,
     private var direction: Direction): Comparable<Cart> {
     private var turnTime = 0
     var hasCrashed = false
 
     fun step() {
-        pos = pos.plusXY(direction.dCol(), direction.dRow())
-//        pos = pos.moveOneStep(direction) ==> cannot use this one, since Direction.Down does y-1 where the y-coordinate increases when going down
+        pos = pos.moveOneStep(direction)
+//        pos = pos.moveOneStep(direction) ==> cannot use this one, since Direction.Down does y-1 where the y-Coordinate increases when going down
         direction = when (rails[pos]!!) {
             '-', '|' -> direction
             '/' -> when (direction) {
@@ -106,7 +106,7 @@ class Cart (
         return "(${pos.x}, ${pos.y}): $direction"
     }
 
-    fun pos(): Coordinate = pos
+    fun pos(): GridPos = pos
 
 
 }

@@ -1,15 +1,15 @@
 package adventofcode2018.december06
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Coordinate
+import tool.coordinatesystem.GridPos
 import tool.coordinatesystem.printAsGrid
 
 fun main() {
-    PuzzleSolver(test=true).showResult()
+    PuzzleSolver(test=false).showResult()
 }
 
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
-    private val coordList = inputLines.map {Coordinate.of(it)}
+    private val coordList = inputLines.map {GridPos.of(it)}
 
     private val maxX = coordList.maxOf{ it.x }
     private val maxY = coordList.maxOf{ it.y }
@@ -30,34 +30,34 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return gridMap.values.count { it < maxManhattanDistance }
     }
 
-    private fun List<Coordinate>.gridValueToString(): String {
+    private fun List<GridPos>.gridValueToString(): String {
         return if (this.size > 1) "." else { ('a'+ coordList.indexOf( this.first() )).toString() }
     }
 
-    private fun Coordinate.isBorder() : Boolean {
+    private fun GridPos.isBorder() : Boolean {
         return this.x == 0 || this.y == 0 || this.x == maxX || this.y == maxY
     }
 
 
-    private fun createMapPuzzleOne(): Map<Coordinate, List<Coordinate>> {
-        return (0..maxX+1).flatMap { x -> (0..maxY).map { y -> Coordinate(x, y) } }
+    private fun createMapPuzzleOne(): Map<GridPos, List<GridPos>> {
+        return (0..maxX+1).flatMap { x -> (0..maxY).map { y -> GridPos(x, y) } }
             .associateWith { coord -> coordList.groupBy { it.manhattanDistance(coord) }.minBy { it.key }.value }
     }
 
-    private fun createMapPuzzleTwo(): Map<Coordinate, Int> {
-        return (0..maxX).flatMap { x -> (0..maxY).map { y -> Coordinate(x, y) } }
+    private fun createMapPuzzleTwo(): Map<GridPos, Int> {
+        return (0..maxX).flatMap { x -> (0..maxY).map { y -> GridPos(x, y) } }
             .associateWith { coord -> coordList.sumOf { it.manhattanDistance(coord) } }
     }
 
-//    private fun Map<Coordinate, List<Coordinate>>.print() {
+//    private fun Map<GridPos, List<GridPos>>.print() {
 //        val maxX = this.keys.maxOf{ it.x }
 //        val maxY = this.keys.maxOf{ it.y }
 //        for (y in 0..maxY) {
 //            for (x in 0..maxX) {
-//                if (this[Coordinate(x,y)]!!.size > 1) {
+//                if (this[GridPos(x,y)]!!.size > 1) {
 //                    print (".")
 //                } else {
-//                    val index = coordList.indexOf( this[Coordinate(x,y)]!!.first() )
+//                    val index = coordList.indexOf( this[GridPos(x,y)]!!.first() )
 //                    print('a'+index)
 //                }
 //            }
@@ -65,12 +65,12 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 //        }
 //    }
 
-    private fun Map<Coordinate, Int>.print2() {
+    private fun Map<GridPos, Int>.print2() {
         val maxX = this.keys.maxOf{ it.x }
         val maxY = this.keys.maxOf{ it.y }
         for (y in 0..maxY) {
             for (x in 0..maxX) {
-                if (this[Coordinate(x,y)]!! < 32) {
+                if (this[GridPos(x,y)]!! < 32) {
                     print ("#")
                 } else {
                     print(".")

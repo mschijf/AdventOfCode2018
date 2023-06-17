@@ -67,25 +67,3 @@ fun Set<Pos>.printAsGrid(defaultEmpty: String=".", defaultAvailable: String="#")
         println()
     }
 }
-
-
-fun List<Pos>.area(): Long {
-    if (this.isEmpty())
-        return 0
-    val minX = this.minOf { it.x }
-    val minY = this.minOf { it.y }
-    val maxX = this.maxOf { it.x }
-    val maxY = this.maxOf { it.y }
-    return (maxX - minX + 1L) * (maxY - minY + 1L)
-}
-
-//fun List<Coordinate>.area(): Long {
-//    if (this.isEmpty())
-//        return 0
-//    val minX = this.minOf { it.x }
-//    val minY = this.minOf { it.y }
-//    val maxX = this.maxOf { it.x }
-//    val maxY = this.maxOf { it.y }
-//    return (maxX - minX + 1L) * (maxY - minY + 1L)
-//}
-

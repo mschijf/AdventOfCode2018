@@ -2,7 +2,6 @@ package adventofcode2018.december10
 
 import adventofcode2018.PuzzleSolverAbstract
 import tool.coordinatesystem.Pos
-import tool.coordinatesystem.area
 import tool.coordinatesystem.printAsGrid
 
 fun main() {
@@ -32,6 +31,17 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     override fun resultPartTwo(): Any {
         return "^^^^^^^"
     }
+
+    private fun List<Pos>.area(): Long {
+        if (this.isEmpty())
+            return 0
+        val minX = this.minOf { it.x }
+        val minY = this.minOf { it.y }
+        val maxX = this.maxOf { it.x }
+        val maxY = this.maxOf { it.y }
+        return (maxX - minX + 1L) * (maxY - minY + 1L)
+    }
+
 }
 
 

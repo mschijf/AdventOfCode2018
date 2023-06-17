@@ -63,16 +63,16 @@ data class Pos(val x: Int, val y: Int) {
             WindDirection.SOUTHEAST -> WindDirection.EAST.dX()
             WindDirection.SOUTHWEST -> WindDirection.WEST.dX()
         }
-    private fun WindDirection.dY() =
+    private fun WindDirection.dY(): Int =
         when (this) {
             WindDirection.NORTH -> -1
             WindDirection.SOUTH -> 1
             WindDirection.EAST -> 0
             WindDirection.WEST -> 0
-            WindDirection.NORTHEAST -> WindDirection.NORTH.dX()
-            WindDirection.NORTHWEST -> WindDirection.NORTH.dX()
-            WindDirection.SOUTHEAST -> WindDirection.SOUTH.dX()
-            WindDirection.SOUTHWEST -> WindDirection.SOUTH.dX()
+            WindDirection.NORTHEAST -> WindDirection.NORTH.dY()
+            WindDirection.NORTHWEST -> WindDirection.NORTH.dY()
+            WindDirection.SOUTHEAST -> WindDirection.SOUTH.dY()
+            WindDirection.SOUTHWEST -> WindDirection.SOUTH.dY()
         }
 
 }

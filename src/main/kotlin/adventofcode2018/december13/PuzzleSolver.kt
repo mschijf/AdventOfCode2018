@@ -2,7 +2,7 @@ package adventofcode2018.december13
 
 import adventofcode2018.PuzzleSolverAbstract
 import tool.coordinatesystem.Direction
-import tool.coordinatesystem.GridPos
+import tool.coordinatesystem.Pos
 
 fun main() {
     PuzzleSolver(test=false).showResult()
@@ -44,13 +44,13 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return carts.filter { !it.hasCrashed }
     }
 
-    private fun readRails(): Map<GridPos, Char> =
+    private fun readRails(): Map<Pos, Char> =
         inputLines.flatMapIndexed { y: Int, s: String ->
             s.mapIndexed { x, c ->
                 when (c) {
-                    in "<>" -> GridPos(x,y) to '-'
-                    in "^v" -> GridPos(x,y) to '|'
-                    else -> GridPos(x,y) to c
+                    in "<>" -> Pos(x,y) to '-'
+                    in "^v" -> Pos(x,y) to '|'
+                    else -> Pos(x,y) to c
                 }
             }
         }.filter{it.second != ' '}.toMap()
@@ -58,7 +58,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     private fun readCarts() =
         inputLines.flatMapIndexed { y: Int, s: String ->
             s.mapIndexed { x, c ->
-                if (c in "<>^v") Cart(rails, GridPos(x,y), c.toDirection()) else null
+                if (c in "<>^v") Cart(rails, Pos(x,y), c.toDirection()) else null
             }
         }.filterNotNull()
 
@@ -67,8 +67,8 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 }
 
 class Cart (
-    private val rails: Map<GridPos, Char>,
-    private var pos: GridPos,
+    private val rails: Map<Pos, Char>,
+    private var pos: Pos,
     private var direction: Direction): Comparable<Cart> {
     private var turnTime = 0
     var hasCrashed = false
@@ -106,7 +106,7 @@ class Cart (
         return "(${pos.x}, ${pos.y}): $direction"
     }
 
-    fun pos(): GridPos = pos
+    fun pos(): Pos = pos
 
 
 }

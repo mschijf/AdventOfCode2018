@@ -1,7 +1,7 @@
 package adventofcode2018.december06
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.GridPos
+import tool.coordinatesystem.Pos
 import tool.coordinatesystem.printAsGrid
 
 fun main() {
@@ -9,7 +9,7 @@ fun main() {
 }
 
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
-    private val coordList = inputLines.map {GridPos.of(it)}
+    private val coordList = inputLines.map {Pos.of(it)}
 
     private val maxX = coordList.maxOf{ it.x }
     private val maxY = coordList.maxOf{ it.y }
@@ -30,22 +30,22 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return gridMap.values.count { it < maxManhattanDistance }
     }
 
-    private fun List<GridPos>.gridValueToString(): String {
+    private fun List<Pos>.gridValueToString(): String {
         return if (this.size > 1) "." else { ('a'+ coordList.indexOf( this.first() )).toString() }
     }
 
-    private fun GridPos.isBorder() : Boolean {
+    private fun Pos.isBorder() : Boolean {
         return this.x == 0 || this.y == 0 || this.x == maxX || this.y == maxY
     }
 
 
-    private fun createMapPuzzleOne(): Map<GridPos, List<GridPos>> {
-        return (0..maxX+1).flatMap { x -> (0..maxY).map { y -> GridPos(x, y) } }
+    private fun createMapPuzzleOne(): Map<Pos, List<Pos>> {
+        return (0..maxX+1).flatMap { x -> (0..maxY).map { y -> Pos(x, y) } }
             .associateWith { coord -> coordList.groupBy { it.manhattanDistance(coord) }.minBy { it.key }.value }
     }
 
-    private fun createMapPuzzleTwo(): Map<GridPos, Int> {
-        return (0..maxX).flatMap { x -> (0..maxY).map { y -> GridPos(x, y) } }
+    private fun createMapPuzzleTwo(): Map<Pos, Int> {
+        return (0..maxX).flatMap { x -> (0..maxY).map { y -> Pos(x, y) } }
             .associateWith { coord -> coordList.sumOf { it.manhattanDistance(coord) } }
     }
 
@@ -65,12 +65,12 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 //        }
 //    }
 
-    private fun Map<GridPos, Int>.print2() {
+    private fun Map<Pos, Int>.print2() {
         val maxX = this.keys.maxOf{ it.x }
         val maxY = this.keys.maxOf{ it.y }
         for (y in 0..maxY) {
             for (x in 0..maxX) {
-                if (this[GridPos(x,y)]!! < 32) {
+                if (this[Pos(x,y)]!! < 32) {
                     print ("#")
                 } else {
                     print(".")

@@ -1,7 +1,7 @@
 package adventofcode2018.december10
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.GridPos
+import tool.coordinatesystem.Pos
 import tool.coordinatesystem.area
 import tool.coordinatesystem.printAsGrid
 
@@ -12,12 +12,12 @@ fun main() {
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
     //position=< 9,  1> velocity=< 0,  2>
-    private val coordList = inputLines.map{ GridPos.of(it.substringAfter("position=<").substringBefore(">")) }
-    private val velocityList = inputLines.map{ GridPos.of(it.substringAfter("velocity=<").substringBefore(">")) }
+    private val coordList = inputLines.map{ Pos.of(it.substringAfter("position=<").substringBefore(">")) }
+    private val velocityList = inputLines.map{ Pos.of(it.substringAfter("velocity=<").substringBefore(">")) }
 
     override fun resultPartOne(): Any {
         var iterationCount = 0
-        var last: List<GridPos>
+        var last: List<Pos>
         var next = coordList
         do {
             last = next

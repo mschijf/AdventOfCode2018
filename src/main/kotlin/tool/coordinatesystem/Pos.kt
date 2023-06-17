@@ -2,8 +2,8 @@ package tool.coordinatesystem
 
 import kotlin.math.absoluteValue
 
-data class GridPos(val x: Int, val y: Int) {
-    fun plusXY(dx: Int, dy: Int) = GridPos(x+dx, y+dy)
+data class Pos(val x: Int, val y: Int) {
+    fun plusXY(dx: Int, dy: Int) = Pos(x+dx, y+dy)
 
     fun plusX(dx: Int) = plusXY(dx, 0)
     fun plusY(dy: Int) = plusXY(0, dy)
@@ -28,13 +28,13 @@ data class GridPos(val x: Int, val y: Int) {
     fun northwest() = moveOneStep(WindDirection.NORTHWEST)
     fun southwest() = moveOneStep(WindDirection.SOUTHWEST)
 
-    fun manhattanDistance(otherPos: GridPos) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
+    fun manhattanDistance(otherPos: Pos) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
 
     companion object {
-        fun of(input: String): GridPos =
+        fun of(input: String): Pos =
             input.split(",")
                 .map { it.trim().toInt() }
-                .run { GridPos(this[0], this[1]) }
+                .run { Pos(this[0], this[1]) }
     }
 
     private fun Direction.dX() =

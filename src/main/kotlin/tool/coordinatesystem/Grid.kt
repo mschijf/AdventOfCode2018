@@ -1,12 +1,12 @@
 package tool.coordinatesystem
 
-fun <T> Map<GridPos, T>.printAsGrid(default: String=".", itemAsString: (T)->String) {
+fun <T> Map<Pos, T>.printAsGrid(default: String=".", itemAsString: (T)->String) {
     val maxX = this.keys.maxByOrNull { it.x }?.x ?: -1
     val maxY = this.keys.maxByOrNull { it.y }?.y ?: -1
 
     (0..maxY).forEach { y ->
         (0..maxX).forEach { x ->
-            val field = GridPos(x,y)
+            val field = Pos(x,y)
             if (this.contains(field)) {
                 print(itemAsString(this[field]!!))
             } else {
@@ -17,7 +17,7 @@ fun <T> Map<GridPos, T>.printAsGrid(default: String=".", itemAsString: (T)->Stri
     }
 }
 
-fun Collection<GridPos>.printAsGrid(itemAsString: (GridPos)->String) {
+fun Collection<Pos>.printAsGrid(itemAsString: (Pos)->String) {
     val minX = this.minByOrNull { it.x }?.x ?: -1
     val minY = this.minByOrNull { it.y }?.y ?: -1
     val maxX = this.maxByOrNull { it.x }?.x ?: -1
@@ -25,14 +25,14 @@ fun Collection<GridPos>.printAsGrid(itemAsString: (GridPos)->String) {
 
     (minY..maxY).forEach { y ->
         (minX..maxX).forEach { x ->
-            val field = GridPos(x,y)
+            val field = Pos(x,y)
             print(itemAsString(field))
         }
         println()
     }
 }
 
-fun Pair<GridPos, GridPos>.printGrid(itemAsString: (GridPos)->String) {
+fun Pair<Pos, Pos>.printGrid(itemAsString: (Pos)->String) {
     val minX = this.first.x
     val minY = this.first.y
     val maxX = this.second.x
@@ -40,7 +40,7 @@ fun Pair<GridPos, GridPos>.printGrid(itemAsString: (GridPos)->String) {
 
     (minY..maxY).forEach { y ->
         (minX..maxX).forEach { x ->
-            val field = GridPos(x,y)
+            val field = Pos(x,y)
             print(itemAsString(field))
         }
         println()
@@ -49,7 +49,7 @@ fun Pair<GridPos, GridPos>.printGrid(itemAsString: (GridPos)->String) {
 
 
 
-fun Set<GridPos>.printAsGrid(defaultEmpty: String=".", defaultAvailable: String="#") {
+fun Set<Pos>.printAsGrid(defaultEmpty: String=".", defaultAvailable: String="#") {
     val minX = this.minByOrNull { it.x }?.x ?: -1
     val minY = this.minByOrNull { it.y }?.y ?: -1
     val maxX = this.maxByOrNull { it.x }?.x ?: -1
@@ -57,7 +57,7 @@ fun Set<GridPos>.printAsGrid(defaultEmpty: String=".", defaultAvailable: String=
 
     (minY..maxY).forEach { y ->
         (minX..maxX).forEach { x ->
-            val field = GridPos(x,y)
+            val field = Pos(x,y)
             if (this.contains(field)) {
                 print(defaultAvailable)
             } else {
@@ -69,7 +69,7 @@ fun Set<GridPos>.printAsGrid(defaultEmpty: String=".", defaultAvailable: String=
 }
 
 
-fun List<GridPos>.area(): Long {
+fun List<Pos>.area(): Long {
     if (this.isEmpty())
         return 0
     val minX = this.minOf { it.x }

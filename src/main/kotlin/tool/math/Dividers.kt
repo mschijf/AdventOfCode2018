@@ -2,6 +2,11 @@ package tool.math
 
 import kotlin.math.sqrt
 
+/**
+ * A proper divisor of a number is any divisor of that number other than the number itself.
+ * For example, consider the number 12. The divisors of 12 are as follows:
+ * Divisors of 12: 1, 2, 3, 4, 6, and 12.
+ */
 fun Int.properDivisors(): Set<Int> {
     val resultSet = mutableSetOf(1)
     for (i in 2 ..sqrt(this.toDouble()).toInt()) {
@@ -13,6 +18,11 @@ fun Int.properDivisors(): Set<Int> {
     return resultSet
 }
 
+/**
+ * A proper divisor of a number is any divisor of that number other than the number itself.
+ * For example, consider the number 12. The divisors of 12 are as follows:
+ * Divisors of 12: 1, 2, 3, 4, 6, and 12.
+ */
 fun Int.dividerCount(): Int {
     var count = 1
     for (i in 2 ..sqrt(this.toDouble()).toInt()) {
@@ -23,6 +33,11 @@ fun Int.dividerCount(): Int {
 //    return properDivisors().count()+1
 }
 
+/**
+ * A proper divisor of a number is any divisor of that number other than the number itself.
+ * For example, consider the number 12. The divisors of 12 are as follows:
+ * Divisors of 12: 1, 2, 3, 4, 6, and 12.
+ */
 fun Int.sumOfProperDivisors(): Int {
     var sum = 1
     for (i in 2 .. sqrt(this.toDouble()).toInt()) {

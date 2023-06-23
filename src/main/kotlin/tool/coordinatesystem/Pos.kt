@@ -31,10 +31,11 @@ data class Pos(val x: Int, val y: Int) {
     fun manhattanDistance(otherPos: Pos) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
 
     companion object {
-        fun of(input: String): Pos =
-            input.split(",")
-                .map { it.trim().toInt() }
-                .run { Pos(this[0], this[1]) }
+        fun of(input: String): Pos = input
+            .removeSurrounding("(", ")")
+            .removeSurrounding("[", "]")
+            .removeSurrounding("{", "}")
+            .split(",").run { Pos(this[0].trim().toInt(), this[1].trim().toInt()) }
     }
 
     private fun Direction.dX() =

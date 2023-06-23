@@ -32,9 +32,11 @@ data class Coordinate(val x: Int, val y: Int) {
 
     companion object {
         fun of(input: String): Coordinate =
-            input.split(",")
-                .map { it.trim().toInt() }
-                .run { Coordinate(this[0], this[1]) }
+            input
+                .removeSurrounding("(", ")")
+                .removeSurrounding("[", "]")
+                .removeSurrounding("{", "}")
+                .split(",").run { Coordinate(this[0].trim().toInt(), this[1].trim().toInt()) }
     }
 
     private fun Direction.dX() =

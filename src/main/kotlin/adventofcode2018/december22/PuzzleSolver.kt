@@ -3,9 +3,7 @@ package adventofcode2018.december22
 import adventofcode2018.PuzzleSolverAbstract
 import tool.coordinatesystem.Pos
 import tool.coordinatesystem.printAsGrid
-import java.lang.Exception
-import java.util.PriorityQueue
-import kotlin.math.min
+import java.util.*
 
 fun main() {
     PuzzleSolver(test=false).showResult()
@@ -29,27 +27,40 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
         return x
     }
 
-    private fun solve(): Int {
-        val compareByMinutes: Comparator<Triple<Pos, Gear, Int>> = compareBy { it.third }
 
-        val visited = mutableSetOf<Pos>()
-        val priorityQueue = PriorityQueue<Triple<Pos, Gear, Int>>(compareByMinutes)
+    //1086 --> too high
+    //1078 --> too high
+    //1054 --> Good!!
+
+    private fun solve(): Int {
+        val compareByMinutes: Comparator<Triple<Pos, Gear, Int>> = compareBy { it.third + it.first.manhattanDistance(target) }
+        var nodesVisited = 0L
+        val visited = mutableMapOf<Pair<Pos, Gear>, Int>()
+        var bestValue = Int.MAX_VALUE
+        val priorityQueue = PriorityQueue(compareByMinutes)
         priorityQueue.add(Triple(mouth, Gear.TORCH, 0))
         while (priorityQueue.isNotEmpty()) {
+            nodesVisited++
             val (current, gear, minutesPassed) = priorityQueue.remove()
+            val vistedKey = Pair(current, gear)
+            if (minutesPassed >= visited.getOrDefault(vistedKey, Int.MAX_VALUE))
+                continue
+            if (minutesPassed + current.manhattanDistance(target) >= bestValue)
+                continue
             if (current == target) {
-                return minutesPassed + if (gear == Gear.TORCH) 0 else 7
+                val targetValue = minutesPassed + if (gear == Gear.TORCH) 0 else 7
+                if (targetValue < bestValue) {
+                    bestValue = targetValue
+                    visited[vistedKey] = bestValue
+                }
+            } else {
+                visited[vistedKey] = minutesPassed
             }
-            visited += current
-
             current.neighbors()
                 .filter { it.x >= 0 && it.y >= 0 }
-                .filter { it.x <= target.x && it.y <= target.y}
-                .filterNot { it in visited }
                 .forEach { neighbor ->
                     geologicalIndex.addRowOrCol(neighbor)
                     val type = geologicalIndex[neighbor]!!.type()
-
                     if (gear.isLegalFor(type)) {
                         priorityQueue.add(Triple(neighbor, gear, minutesPassed + 1))
                     } else {
@@ -58,8 +69,10 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
                     }
                 }
         }
-        return -1
+        println("Nodes visited: $nodesVisited")
+        return bestValue
     }
+
 
     private fun Gear.isLegalFor(type: Int): Boolean {
         return when(type) {
@@ -137,58 +150,4 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 
 enum class Gear {
     TORCH, CLIMBING, NEITHER;
-}
-
-
-
-class PriorityTree(start: Triple<Pos, Gear, Int>) {
-
-    val root = Node(null, start)
-
-    fun Node.addChildren(listOfChildren: List<Triple<Pos, Gear, Int>>) {
-        listOfChildren.forEach {item ->
-            val newNode = Node(this, item)
-            newNode.sibling = this.child
-            this.child = newNode
-        }
-    }
-
-    fun getMostPrioChild(): Node {
-        var current = root
-        while (current.child != null) {
-            var ch = current.child
-            while (ch!!.prioValue != current.prioValue) {
-                ch = ch.sibling
-            }
-            current = ch
-        }
-        return current
-    }
-
-    fun Node.updateParents(): Node {
-        var current: Node? = this
-        while (current != null) {
-            var ch = current.child
-            var lowest = 100_000_0000
-            while (ch != null) {
-                lowest = min(ch.prioValue, lowest)
-                ch = ch.sibling
-            }
-            val oldValue = current.prioValue
-            if (oldValue == lowest)
-                return current
-            current.prioValue = lowest
-            current = current.parent
-        }
-        return root
-    }
-
-}
-
-class Node(
-    val parent: Node?,
-    var value: Triple<Pos, Gear, Int>) {
-    var prioValue = value.third
-    var child: Node? = null
-    var sibling: Node? = null
 }

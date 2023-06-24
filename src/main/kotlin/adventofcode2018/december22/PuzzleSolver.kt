@@ -32,29 +32,46 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     //1078 --> too high
     //1054 --> Good!!
 
+    /**
+     * Voor de solver maken we gebruik van een paar technieken:
+     * 1. we doen een best-first search en daarbij maken we gebruik van
+     * 2. een priorityqueue, die de meest veelbelovende vooraan zet
+     * 3. een visited map, die check of een bepaalde cell al eerder is bezocht (met dezelfde gear)!
+     * 4. Voor de bestfirts search maken we gebruk van een onderschatter: de manhattan-distance
+     *    Dit zorgt er vor dat we bijtijds stoppen als we ver uit het grid gaan
+     *
+     * In de priority queue stoppen we vier gegevens:
+     *    de Pos van de cell, de gear die we hebben (samengevoegd in een Pair)
+     *    de afgelegde afstand (in minutes)
+     *    de minimale nog af te leggen afstand (manhattan distance)
+     *
+     * Note: de priorityqueue implementatie (van Java) zorgt voor een vertraging, maar al met al nog steeds binnen de seconde
+     *       het loont de moeite om in dit geval een eigen priority queue implementatie te schrijven
+     *
+     */
     private fun solve(): Int {
-        val compareByMinutes: Comparator<Triple<Pos, Gear, Int>> = compareBy { it.third + it.first.manhattanDistance(target) }
+        val compareByMinutes: Comparator<Triple<Pair<Pos, Gear>, Int, Int>> = compareBy { it.second + it.third }
         var nodesVisited = 0L
         val visited = mutableMapOf<Pair<Pos, Gear>, Int>()
         var bestValue = Int.MAX_VALUE
         val priorityQueue = PriorityQueue(compareByMinutes)
-        priorityQueue.add(Triple(mouth, Gear.TORCH, 0))
+        priorityQueue.add(Triple(Pair(mouth, Gear.TORCH), 0, mouth.manhattanDistance(target)))
         while (priorityQueue.isNotEmpty()) {
             nodesVisited++
-            val (current, gear, minutesPassed) = priorityQueue.remove()
-            val vistedKey = Pair(current, gear)
-            if (minutesPassed >= visited.getOrDefault(vistedKey, Int.MAX_VALUE))
+            val (visitedKey, minutesPassed, manhattanDistance) = priorityQueue.remove()
+            val (current, gear) = visitedKey
+            if (minutesPassed >= visited.getOrDefault(visitedKey, Int.MAX_VALUE))
                 continue
-            if (minutesPassed + current.manhattanDistance(target) >= bestValue)
+            if (minutesPassed + manhattanDistance >= bestValue)
                 continue
             if (current == target) {
                 val targetValue = minutesPassed + if (gear == Gear.TORCH) 0 else 7
                 if (targetValue < bestValue) {
                     bestValue = targetValue
-                    visited[vistedKey] = bestValue
+                    visited[visitedKey] = bestValue
                 }
             } else {
-                visited[vistedKey] = minutesPassed
+                visited[visitedKey] = minutesPassed
             }
             current.neighbors()
                 .filter { it.x >= 0 && it.y >= 0 }
@@ -62,10 +79,10 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
                     geologicalIndex.addRowOrCol(neighbor)
                     val type = geologicalIndex[neighbor]!!.type()
                     if (gear.isLegalFor(type)) {
-                        priorityQueue.add(Triple(neighbor, gear, minutesPassed + 1))
+                        priorityQueue.add(Triple(Pair(neighbor, gear), minutesPassed + 1, neighbor.manhattanDistance(target)))
                     } else {
                         val newGear = usableGear(geologicalIndex[current]!!.type(), geologicalIndex[neighbor]!!.type())
-                        priorityQueue.add(Triple(neighbor, newGear, minutesPassed + 7 + 1))
+                        priorityQueue.add(Triple(Pair(neighbor, newGear), minutesPassed + 7 + 1, neighbor.manhattanDistance(target)))
                     }
                 }
         }

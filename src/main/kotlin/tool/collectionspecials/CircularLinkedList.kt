@@ -1,10 +1,5 @@
 package tool.collectionspecials
 
-interface ListPointer {
-    operator fun plus(steps: Int): ListPointer
-    operator fun minus(steps: Int): ListPointer
-}
-
 interface ICircularLinkedList<T> : Iterable<T> {
     fun isEmpty(): Boolean
     fun add(element: T): ListPointer

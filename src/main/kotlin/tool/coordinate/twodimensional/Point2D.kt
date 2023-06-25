@@ -38,6 +38,8 @@ data class Point2D(val x: Int, val y: Int) {
                 .removeSurrounding("[", "]")
                 .removeSurrounding("{", "}")
                 .split(",").run { Point2D(this[0].trim().toInt(), this[1].trim().toInt()) }
+
+        val origin = Point2D(0,0)
     }
 
     private fun Direction.dX() =

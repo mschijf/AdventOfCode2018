@@ -4,6 +4,11 @@ import kotlin.math.absoluteValue
 
 data class Point3D(val x: Int, val y: Int, val z: Int) {
 
+    fun plusXYZ(dx: Int, dy: Int, dz: Int) = Point3D(x+dx, y+dy, z+dz)
+    fun plusX(dx: Int) = plusXYZ(x+dx, y, z)
+    fun plusY(dy: Int) = plusXYZ(x, y+dy, z)
+    fun plusZ(dz: Int) = plusXYZ(x, y, z+dz)
+
     fun manhattanDistance(otherPos: Point3D) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue + (otherPos.z - z).absoluteValue
 
     companion object {

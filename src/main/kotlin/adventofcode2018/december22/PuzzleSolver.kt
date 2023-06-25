@@ -1,8 +1,8 @@
 package adventofcode2018.december22
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Pos
-import tool.coordinatesystem.printAsGrid
+import tool.coordinate.twodimensional.Pos
+import tool.coordinate.twodimensional.printAsGrid
 import java.util.*
 
 fun main() {

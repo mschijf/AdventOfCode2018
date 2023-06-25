@@ -1,8 +1,7 @@
 package adventofcode2018.december18
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Pos
-import tool.coordinatesystem.printAsGrid
+import tool.coordinate.twodimensional.Pos
 
 fun main() {
     PuzzleSolver(test=false).showResult()

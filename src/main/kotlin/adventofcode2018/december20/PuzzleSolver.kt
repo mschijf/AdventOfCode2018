@@ -1,7 +1,7 @@
 package adventofcode2018.december20
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Pos
+import tool.coordinate.twodimensional.Pos
 
 fun main() {
     PuzzleSolver(test=false).showResult()
@@ -22,7 +22,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 //        return grid.keys.map{ to -> grid.shortestPath(startPos, to) }.count { it >= 1000 }
     }
 
-    private fun String.makeGrid(startPos: Pos=Pos(0,0)): Map<Pos, Set<Pos>> {
+    private fun String.makeGrid(startPos: Pos = Pos(0,0)): Map<Pos, Set<Pos>> {
         val result = mutableMapOf<Pos, MutableSet<Pos>>()
         var currentPos = startPos
         val stack = ArrayDeque<Pos>()

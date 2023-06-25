@@ -1,4 +1,4 @@
-package tool.coordinatesystem
+package tool.coordinate.twodimensional
 
 enum class Direction(val directionChar: Char) {
     UP('^') {

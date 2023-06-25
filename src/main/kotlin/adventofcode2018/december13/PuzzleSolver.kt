@@ -1,8 +1,8 @@
 package adventofcode2018.december13
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Direction
-import tool.coordinatesystem.Pos
+import tool.coordinate.twodimensional.Direction
+import tool.coordinate.twodimensional.Pos
 
 fun main() {
     PuzzleSolver(test=false).showResult()
@@ -69,7 +69,8 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 class Cart (
     private val rails: Map<Pos, Char>,
     private var pos: Pos,
-    private var direction: Direction): Comparable<Cart> {
+    private var direction: Direction
+): Comparable<Cart> {
     private var turnTime = 0
     var hasCrashed = false
 

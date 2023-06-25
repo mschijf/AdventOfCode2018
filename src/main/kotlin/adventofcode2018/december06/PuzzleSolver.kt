@@ -1,15 +1,15 @@
 package adventofcode2018.december06
 
 import adventofcode2018.PuzzleSolverAbstract
-import tool.coordinatesystem.Pos
-import tool.coordinatesystem.printAsGrid
+import tool.coordinate.twodimensional.Pos
+import tool.coordinate.twodimensional.printAsGrid
 
 fun main() {
     PuzzleSolver(test=false).showResult()
 }
 
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
-    private val coordList = inputLines.map {Pos.of(it)}
+    private val coordList = inputLines.map { Pos.of(it)}
 
     private val maxX = coordList.maxOf{ it.x }
     private val maxY = coordList.maxOf{ it.y }

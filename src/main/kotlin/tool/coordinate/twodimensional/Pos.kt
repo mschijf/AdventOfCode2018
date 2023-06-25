@@ -1,9 +1,9 @@
-package tool.coordinatesystem
+package tool.coordinate.twodimensional
 
 import kotlin.math.absoluteValue
 
-data class Coordinate(val x: Int, val y: Int) {
-    fun plusXY(dx: Int, dy: Int) = Coordinate(x+dx, y+dy)
+data class Pos(val x: Int, val y: Int) {
+    fun plusXY(dx: Int, dy: Int) = Pos(x+dx, y+dy)
 
     fun plusX(dx: Int) = plusXY(dx, 0)
     fun plusY(dy: Int) = plusXY(0, dy)
@@ -28,15 +28,15 @@ data class Coordinate(val x: Int, val y: Int) {
     fun northwest() = moveOneStep(WindDirection.NORTHWEST)
     fun southwest() = moveOneStep(WindDirection.SOUTHWEST)
 
-    fun manhattanDistance(otherPos: Coordinate) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
+    fun manhattanDistance(otherPos: Pos) = (otherPos.x - x).absoluteValue + (otherPos.y - y).absoluteValue
 
     companion object {
-        fun of(input: String): Coordinate =
-            input
-                .removeSurrounding("(", ")")
-                .removeSurrounding("[", "]")
-                .removeSurrounding("{", "}")
-                .split(",").run { Coordinate(this[0].trim().toInt(), this[1].trim().toInt()) }
+        fun of(input: String): Pos = input
+            .removeSurrounding("<", ">")
+            .removeSurrounding("(", ")")
+            .removeSurrounding("[", "]")
+            .removeSurrounding("{", "}")
+            .split(",").run { Pos(this[0].trim().toInt(), this[1].trim().toInt()) }
     }
 
     private fun Direction.dX() =
@@ -44,12 +44,12 @@ data class Coordinate(val x: Int, val y: Int) {
             Direction.DOWN -> 0
             Direction.UP -> 0
             Direction.LEFT -> -1
-            Direction.RIGHT -> -1
+            Direction.RIGHT -> 1
         }
     private fun Direction.dY() =
         when(this) {
-            Direction.DOWN -> -1
-            Direction.UP -> 1
+            Direction.DOWN -> 1
+            Direction.UP -> -1
             Direction.LEFT -> 0
             Direction.RIGHT -> 0
         }
@@ -65,16 +65,16 @@ data class Coordinate(val x: Int, val y: Int) {
             WindDirection.SOUTHEAST -> WindDirection.EAST.dX()
             WindDirection.SOUTHWEST -> WindDirection.WEST.dX()
         }
-    private fun WindDirection.dY() =
+    private fun WindDirection.dY(): Int =
         when (this) {
-            WindDirection.NORTH -> 1
-            WindDirection.SOUTH -> -1
+            WindDirection.NORTH -> -1
+            WindDirection.SOUTH -> 1
             WindDirection.EAST -> 0
             WindDirection.WEST -> 0
-            WindDirection.NORTHEAST -> WindDirection.NORTH.dX()
-            WindDirection.NORTHWEST -> WindDirection.NORTH.dX()
-            WindDirection.SOUTHEAST -> WindDirection.SOUTH.dX()
-            WindDirection.SOUTHWEST -> WindDirection.SOUTH.dX()
+            WindDirection.NORTHEAST -> WindDirection.NORTH.dY()
+            WindDirection.NORTHWEST -> WindDirection.NORTH.dY()
+            WindDirection.SOUTHEAST -> WindDirection.SOUTH.dY()
+            WindDirection.SOUTHWEST -> WindDirection.SOUTH.dY()
         }
 
 }

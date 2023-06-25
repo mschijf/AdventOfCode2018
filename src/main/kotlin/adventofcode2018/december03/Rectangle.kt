@@ -1,6 +1,6 @@
 package adventofcode2018.december03
 
-import tool.coordinatesystem.Coordinate
+import tool.coordinate.twodimensional.Point2D
 import kotlin.math.max
 import kotlin.math.min
 
@@ -30,10 +30,10 @@ data class Rectangle(
         }
     }
 
-    fun asCoordinates(): List<Coordinate> =
+    fun asCoordinates(): List<Point2D> =
         (minX .. maxX).flatMap { x ->
             (minY .. maxY).map { y ->
-                Coordinate(x, y)
+                Point2D(x, y)
             }
         }
 

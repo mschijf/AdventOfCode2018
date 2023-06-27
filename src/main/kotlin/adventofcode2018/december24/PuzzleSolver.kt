@@ -17,29 +17,30 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             .mapIndexed { index, rawInput -> Group.of("$armyName group " + (index+1), rawInput) }
     }
 
-//    override fun resultPartOne(): Any {
-//        val infectionArmy = createArmy("Infection")
-//        val immuneArmy = createArmy("Immune System")
-//
-//        combat(infectionArmy, immuneArmy)
-//        return "(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})"
-//    }
+    override fun resultPartOne(): Any {
+        val infectionArmy = createArmy("Infection")//orgInfectionArmy.map { it.copy() }
+        val immuneArmy = createArmy("Immune System")//orgImmuneArmy.map { it.copy() }
+
+        combat(infectionArmy, immuneArmy)
+        return "(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})"
+    }
 
     override fun resultPartTwo(): Any {
         var boost = 0
+        var infectionArmy: List<Group>
+        var immuneArmy: List<Group>
         do {
             boost++
-            print ("Trying with boost: $boost ==> ")
-            val infectionArmy = createArmy("Infection")
-            val immuneArmy = createArmy("Immune System")
-
-            immuneArmy.forEach { it.unit.boostAttackDamage(boost) }
+//            print ("Trying with boost: $boost ==> ")
+            infectionArmy = createArmy("Infection")
+            immuneArmy = createArmy("Immune System").onEach { it.unit.boostAttackDamage(boost) }
 
             combat(infectionArmy, immuneArmy)
 
-            println("(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})")
+//            println("(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})")
         } while (infectionArmy.count { it.alive() } != 0)
-        return boost
+
+        return "(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }}) after boost: $boost"
     }
 
     private fun combat(infectionArmy: List<Group>, immuneArmy: List<Group>) {
@@ -50,12 +51,10 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             selection.attackingPhase()
             val newUnitCount = infectionArmy.sumOf { it.unitCount } + immuneArmy.sumOf { it.unitCount }
             if (prevUnitCount == newUnitCount) {
-//                println("No more killings - stop combat")
                 break
             } else {
                 prevUnitCount = newUnitCount
             }
-
 //            printInfo(infectionArmy, immuneArmy)
         }
     }
@@ -77,12 +76,12 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     private fun List<Group>.select(defendingGroupList: List<Group>): Map<Group, Group> {
         val chosen = mutableSetOf<Group>()
         val result = this
-            .sortedByDescending { 10000L * it.effectivePower() + it.unit.initiative }
+            .sortedWith(compareByDescending<Group> { it.effectivePower() }.thenByDescending { it.unit.initiative })
             .associateWith { attacker ->
                 defendingGroupList
                     .filterNot { it in chosen }
                     .filter{it.calculatedDamage(attacker) > 0}
-                    .maxByOrNull { 1_000_000L*it.calculatedDamage(attacker) + 100L*it.effectivePower() + it.unit.initiative }
+                    .maxWithOrNull(compareBy<Group> { it.calculatedDamage(attacker)}.thenBy{ it.effectivePower() }.thenBy { it.unit.initiative })
                     .also { if (it != null) chosen += it }
             }
         return result.mapNotNull { (key, value) -> value?.let { key to it } }.toMap()
@@ -118,10 +117,10 @@ class Group(
     }
 
     fun calculatedDamage(attacker: Group) =
-        when (attacker.unit.attackType) {
+        attacker.effectivePower() * when (attacker.unit.attackType) {
             in unit.immuneList -> 0
-            in unit.weaknessList -> 2*attacker.effectivePower()
-            else -> attacker.effectivePower()
+            in unit.weaknessList -> 2
+            else -> 1
         }
 
     companion object {

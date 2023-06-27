@@ -5,7 +5,7 @@ import com.tool.mylambdas.splitByCondition
 import kotlin.math.min
 
 fun main() {
-    PuzzleSolver(test = true).showResult()
+    PuzzleSolver(test = false).showResult()
 }
 
 class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
@@ -17,31 +17,55 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             .mapIndexed { index, rawInput -> Group.of("$armyName group " + (index+1), rawInput) }
     }
 
-    override fun resultPartOne(): Any {
-        val infectionArmy = createArmy("Infection")
-        val immuneArmy = createArmy("Immune System")
-
-        combat(infectionArmy, immuneArmy)
-        return "(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})"
-    }
+//    override fun resultPartOne(): Any {
+//        val infectionArmy = createArmy("Infection")
+//        val immuneArmy = createArmy("Immune System")
+//
+//        combat(infectionArmy, immuneArmy)
+//        return "(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})"
+//    }
 
     override fun resultPartTwo(): Any {
-        val infectionArmy = createArmy("Infection")
-        val immuneArmy = createArmy("Immune System")
+        var boost = 0
+        do {
+            boost++
+            print ("Trying with boost: $boost ==> ")
+            val infectionArmy = createArmy("Infection")
+            val immuneArmy = createArmy("Immune System")
 
-        immuneArmy.forEach { it.unit.boostAttackDamage(1500) }
-        combat(infectionArmy, immuneArmy)
+            immuneArmy.forEach { it.unit.boostAttackDamage(boost) }
 
-        return "(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})"
+            combat(infectionArmy, immuneArmy)
+
+            println("(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})")
+        } while (infectionArmy.count { it.alive() } != 0)
+        return boost
     }
 
     private fun combat(infectionArmy: List<Group>, immuneArmy: List<Group>) {
-        println("(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})")
+//        printInfo(infectionArmy, immuneArmy)
+        var prevUnitCount = infectionArmy.sumOf { it.unitCount } + immuneArmy.sumOf { it.unitCount }
         while (infectionArmy.any{it.alive()} && immuneArmy.any{it.alive()}) {
             val selection = targetSelectionPhase(infectionArmy.filter { it.alive() }, immuneArmy.filter { it.alive() })
             selection.attackingPhase()
-            println("(infection, immunity) = (${infectionArmy.sumOf { it.unitCount }}, ${immuneArmy.sumOf { it.unitCount }})")
+            val newUnitCount = infectionArmy.sumOf { it.unitCount } + immuneArmy.sumOf { it.unitCount }
+            if (prevUnitCount == newUnitCount) {
+//                println("No more killings - stop combat")
+                break
+            } else {
+                prevUnitCount = newUnitCount
+            }
+
+//            printInfo(infectionArmy, immuneArmy)
         }
+    }
+
+    private fun printInfo(infectionArmy: List<Group>, immuneArmy: List<Group>) {
+        println("Immune System:")
+        immuneArmy.forEach { println("  ${it.name}  contains ${it.unitCount} and has effective power (${it.effectivePower()})") }
+
+        println("Infection:")
+        infectionArmy.forEach { println("  ${it.name}  contains ${it.unitCount}") }
     }
 
     private fun targetSelectionPhase(infectionArmy: List<Group>, immuneArmy: List<Group>): Map<Group, Group> {
@@ -57,8 +81,8 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             .associateWith { attacker ->
                 defendingGroupList
                     .filterNot { it in chosen }
-                    .filter{it.calculatedDamage(attacker.unit.attackType, attacker.effectivePower()) > 0}
-                    .maxByOrNull { 1_000_000L*it.calculatedDamage(attacker.unit.attackType, attacker.effectivePower()) + 100L*it.effectivePower() + it.unit.initiative }
+                    .filter{it.calculatedDamage(attacker) > 0}
+                    .maxByOrNull { 1_000_000L*it.calculatedDamage(attacker) + 100L*it.effectivePower() + it.unit.initiative }
                     .also { if (it != null) chosen += it }
             }
         return result.mapNotNull { (key, value) -> value?.let { key to it } }.toMap()
@@ -67,7 +91,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     private fun Map<Group, Group>.attackingPhase() {
         this.keys.sortedByDescending { it.unit.initiative }.forEach {attacker ->
             val defender = this[attacker]!!
-            defender.attackedBy(attacker.unit.attackType, attacker.effectivePower())
+            defender.attackedBy(attacker)
         }
     }
 
@@ -86,18 +110,18 @@ class Group(
     fun effectivePower(): Int =
         unitCount * unit.attackDamage
 
-    fun attackedBy(attackType: AttackType, attackPower: Int) {
-        val damage = calculatedDamage(attackType, attackPower)
+    fun attackedBy(attacker: Group) {
+        val damage = calculatedDamage(attacker)
         val unitsLost = min(unitCount, damage/unit.hitPoints)
-//        println("    $name loses $unitsLost units")
+//        println("*** $attacker attacks $name, killing $unitsLost units (by damage of $damage)")
         unitCount -= unitsLost
     }
 
-    fun calculatedDamage(attackType: AttackType, attackPower: Int) =
-        when (attackType) {
+    fun calculatedDamage(attacker: Group) =
+        when (attacker.unit.attackType) {
             in unit.immuneList -> 0
-            in unit.weaknessList -> 2*attackPower
-            else -> attackPower
+            in unit.weaknessList -> 2*attacker.effectivePower()
+            else -> attacker.effectivePower()
         }
 
     companion object {

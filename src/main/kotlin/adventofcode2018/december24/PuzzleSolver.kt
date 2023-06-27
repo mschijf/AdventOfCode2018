@@ -97,7 +97,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 }
 
 
-class Group(
+data class Group(
     val name: String,
     var unitCount: Int,
     val hitPoints: Int,
@@ -107,6 +107,16 @@ class Group(
     val immuneList: List<AttackType>,
     val weaknessList: List<AttackType>,
 ) {
+
+    // for data class, we now need to override hashCode and euqls, because the group can be changed due to the var property
+    // Tp: rather not use data class with var properties
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is Group) name == other.name else super.equals(other)
+    }
 
     fun alive(): Boolean =
         unitCount > 0

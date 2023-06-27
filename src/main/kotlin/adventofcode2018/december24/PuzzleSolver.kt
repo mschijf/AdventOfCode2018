@@ -33,7 +33,7 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
             boost++
 //            print ("Trying with boost: $boost ==> ")
             infectionArmy = createArmy("Infection")
-            immuneArmy = createArmy("Immune System").onEach { it.unit.boostAttackDamage(boost) }
+            immuneArmy = createArmy("Immune System").onEach { it.boostAttackDamage(boost) }
 
             combat(infectionArmy, immuneArmy)
 
@@ -76,19 +76,19 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
     private fun List<Group>.select(defendingGroupList: List<Group>): Map<Group, Group> {
         val chosen = mutableSetOf<Group>()
         val result = this
-            .sortedWith(compareByDescending<Group> { it.effectivePower() }.thenByDescending { it.unit.initiative })
+            .sortedWith(compareByDescending<Group> { it.effectivePower() }.thenByDescending { it.initiative })
             .associateWith { attacker ->
                 defendingGroupList
                     .filterNot { it in chosen }
                     .filter{it.calculatedDamage(attacker) > 0}
-                    .maxWithOrNull(compareBy<Group> { it.calculatedDamage(attacker)}.thenBy{ it.effectivePower() }.thenBy { it.unit.initiative })
+                    .maxWithOrNull(compareBy<Group> { it.calculatedDamage(attacker)}.thenBy{ it.effectivePower() }.thenBy { it.initiative })
                     .also { if (it != null) chosen += it }
             }
         return result.mapNotNull { (key, value) -> value?.let { key to it } }.toMap()
     }
 
     private fun Map<Group, Group>.attackingPhase() {
-        this.keys.sortedByDescending { it.unit.initiative }.forEach {attacker ->
+        this.keys.sortedByDescending { it.initiative }.forEach {attacker ->
             val defender = this[attacker]!!
             defender.attackedBy(attacker)
         }
@@ -100,47 +100,6 @@ class PuzzleSolver(test: Boolean) : PuzzleSolverAbstract(test) {
 class Group(
     val name: String,
     var unitCount: Int,
-    val unit: Unit
-) {
-
-    fun alive(): Boolean =
-        unitCount > 0
-
-    fun effectivePower(): Int =
-        unitCount * unit.attackDamage
-
-    fun attackedBy(attacker: Group) {
-        val damage = calculatedDamage(attacker)
-        val unitsLost = min(unitCount, damage/unit.hitPoints)
-//        println("*** $attacker attacks $name, killing $unitsLost units (by damage of $damage)")
-        unitCount -= unitsLost
-    }
-
-    fun calculatedDamage(attacker: Group) =
-        attacker.effectivePower() * when (attacker.unit.attackType) {
-            in unit.immuneList -> 0
-            in unit.weaknessList -> 2
-            else -> 1
-        }
-
-    companion object {
-        fun of(name: String, rawInput: String): Group {
-            val unitCount = rawInput.substringBefore(" unit")
-            val unit = Unit.of(rawInput)
-            return Group(name, unitCount.toInt(), unit)
-        }
-    }
-
-    override fun toString(): String {
-        return "$name ${if (!alive()) "+" else ""}"
-    }
-
-    fun print() {
-        println("$name ${if (!alive()) "+" else ""}: unit count: $unitCount (Effective Power: ${effectivePower()}) ==> $unit")
-    }
-}
-
-class Unit(
     val hitPoints: Int,
     val attackType: AttackType,
     var attackDamage: Int,
@@ -149,8 +108,33 @@ class Unit(
     val weaknessList: List<AttackType>,
 ) {
 
+    fun alive(): Boolean =
+        unitCount > 0
+
+    fun effectivePower(): Int =
+        unitCount * attackDamage
+
+    fun attackedBy(attacker: Group) {
+        val damage = calculatedDamage(attacker)
+        val unitsLost = min(unitCount, damage/hitPoints)
+//        println("*** $attacker attacks $name, killing $unitsLost units (by damage of $damage)")
+        unitCount -= unitsLost
+    }
+
+    fun calculatedDamage(attacker: Group) =
+        attacker.effectivePower() * when (attacker.attackType) {
+            in immuneList -> 0
+            in weaknessList -> 2
+            else -> 1
+        }
+
+    fun boostAttackDamage(extraDamage: Int) {
+        attackDamage += extraDamage
+    }
+
     companion object {
-        fun of(rawInput: String): Unit {
+        fun of(name: String, rawInput: String): Group {
+            val unitCount = rawInput.substringBefore(" unit")
             val hitPoints = rawInput.substringAfter(" each with ").substringBefore(" hit points ")
             val attackDamage = rawInput.substringAfter(" that does ").substringBefore(" ")
             val attackType = rawInput.substringAfter(attackDamage + " ").substringBefore(" damage")
@@ -159,12 +143,11 @@ class Unit(
             val immuneTo = rawInput.toAttackTypeList("immune to ")
             val weakTo = rawInput.toAttackTypeList("weak to ")
 
-            return Unit(
+            return Group(name, unitCount.toInt(),
                 hitPoints.toInt(), AttackType.valueOf(attackType.uppercase()), attackDamage.toInt(), initiative.toInt(),
                 immuneTo, weakTo
             )
         }
-
         private fun String.toAttackTypeList(searcher: String): List<AttackType> {
             return if (this.contains(searcher))
                 this.substringAfter(searcher).substringBefore(";").substringBefore(")")
@@ -176,13 +159,14 @@ class Unit(
 
     }
 
-    fun boostAttackDamage(extraDamage: Int) {
-        attackDamage += extraDamage
+    override fun toString(): String {
+        return "$name ${if (!alive()) "+" else ""}"
     }
 
-    override fun toString(): String {
-        return "hitPoints: $hitPoints, attackType: $attackType, attackDamage: $attackDamage, initiative: $initiative, " +
-                "immune to: '$immuneList', weak to: '$weaknessList'"
+    fun print() {
+        println("$name ${if (!alive()) "+" else ""}: unit count: $unitCount (Effective Power: ${effectivePower()}) ==> " +
+            "hitPoints: $hitPoints, attackType: $attackType, attackDamage: $attackDamage, initiative: $initiative, " +
+                    "immune to: '$immuneList', weak to: '$weaknessList'")
     }
 }
 
